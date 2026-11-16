@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>سرّ الجدار المنقوش: الهروب من كهف الرموز الأولى</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e7dfcd; --wall:#d6cbb2; --surface:#f5efe1; --ink:#241b12; --muted:#6a5a45;
+  --line:#b9a98a; --ochre:#8f5410; --ochre-ink:#fff7e8; --red:#a23b22;
+  --good:#2b6a43; --bad:#a3261e; --glow:rgba(201,138,43,.28);
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15100c; --wall:#241a13; --surface:#2b2018; --ink:#f0e5cf; --muted:#b5a389;
+    --line:#4a3a2b; --ochre:#e0a23f; --ochre-ink:#1c1208; --red:#d9694a;
+    --good:#7fd19b; --bad:#ff8a7e; --glow:rgba(224,162,63,.18);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15100c; --wall:#241a13; --surface:#2b2018; --ink:#f0e5cf; --muted:#b5a389;
+  --line:#4a3a2b; --ochre:#e0a23f; --ochre-ink:#1c1208; --red:#d9694a;
+  --good:#7fd19b; --bad:#ff8a7e; --glow:rgba(224,162,63,.18);
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*,*::before,*::after{box-sizing:inherit;}
+body{
+  margin:0; min-height:100%;
+  background:radial-gradient(ellipse 80% 40% at 50% -5%, var(--glow), transparent 70%), var(--bg);
+  background-color:var(--bg);
+  color:var(--ink);
+  font-family:Tajawal,"Segoe UI",Tahoma,sans-serif;
+  font-size:17px; line-height:1.7;
+}
+body::before{
+  content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px);
+  z-index:30; background:var(--surface);
+}
+h1,h2,h3{font-family:"Reem Kufi",Tajawal,"Segoe UI",sans-serif; line-height:1.3; margin:0 0 .4em;}
+h1{font-size:clamp(1.9rem,6vw,2.8rem); font-weight:700;}
+h2{font-size:1.5rem; font-weight:700;}
+h3{font-size:1.1rem; font-weight:500; color:var(--muted);}
+p{margin:.4em 0 .8em;}
+.sym{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif; font-size:2rem; line-height:1; font-style:normal;}
+.tl{font-size:1.9rem; letter-spacing:.22em; font-weight:700; line-height:1;}
+.hud{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:40;
+  background:var(--surface); border-bottom:1px solid var(--line);
+  padding:8px 14px 0;
+}
+.hud[hidden]{display:none;}
+.hud-row{display:flex; align-items:center; justify-content:space-between; gap:10px; max-width:760px; margin:0 auto; flex-wrap:wrap;}
+.clock{font-family:"Reem Kufi",Tajawal,sans-serif; font-size:1.6rem; font-weight:700; font-variant-numeric:tabular-nums; direction:ltr; display:inline-flex; gap:6px; align-items:center;}
+.clock.low{color:var(--bad);}
+.flame{display:inline-block;}
+@media (prefers-reduced-motion: no-preference){
+  .flame{animation:flick 1.4s ease-in-out infinite alternate; transform-origin:50% 90%;}
+  @keyframes flick{from{transform:scale(1) rotate(-3deg);}to{transform:scale(1.12) rotate(3deg);}}
+  .shake{animation:shk .35s;}
+  @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+}
+.code{display:flex; gap:6px; align-items:center; font-size:.9rem; color:var(--muted);}
+.cs{
+  width:2.1rem; height:2.4rem; display:inline-grid; place-items:center;
+  border:2px dashed var(--line); border-radius:6px; font-family:"Reem Kufi",Tajawal,sans-serif; font-size:1.3rem; font-weight:700;
+}
+.cs.on{border:2px solid var(--ochre); background:var(--ochre); color:var(--ochre-ink);}
+.torch{height:5px; background:var(--line); margin:8px -14px 0; overflow:hidden;}
+.torch i{display:block; height:100%; width:100%; background:var(--ochre); transition:width 1s linear;}
+.wrap{max-width:760px; margin:0 auto; padding:16px 16px 60px;}
+.stage{display:none;}
+.stage.on{display:block;}
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px; margin:14px 0;}
+.rock{
+  background:
+    radial-gradient(circle at 20% 25%, rgba(0,0,0,.07) 0 12%, transparent 13%),
+    radial-gradient(circle at 78% 65%, rgba(0,0,0,.06) 0 15%, transparent 16%),
+    radial-gradient(circle at 45% 85%, rgba(255,255,255,.06) 0 10%, transparent 11%),
+    var(--wall);
+  border:2px solid var(--line); border-radius:6px 18px 8px 16px;
+}
+.btn{
+  font:inherit; font-weight:700; cursor:pointer; border:0; border-radius:10px;
+  background:var(--ochre); color:var(--ochre-ink); padding:.65em 1.3em; min-height:46px;
+}
+.btn.ghost{background:transparent; color:var(--ink); border:2px solid var(--line);}
+.btn:disabled{opacity:.45; cursor:not-allowed;}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--ochre); outline-offset:2px;}
+.row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+.sent{display:flex; align-items:center; gap:14px; padding:10px 6px; border-bottom:1px dashed var(--line); flex-wrap:wrap;}
+.sent:last-child{border-bottom:0;}
+.sent .syms{display:inline-flex; gap:10px; min-width:130px;}
+.sent .tr{color:var(--ink);}
+.secret{justify-content:center; padding:16px 0 6px;}
+.secret .syms{gap:18px;}
+.secret .sym{font-size:3rem;}
+.dict{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px;}
+.dict label{display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:8px 10px;}
+select,input[type=text]{
+  font:inherit; color:var(--ink); background:var(--surface); border:2px solid var(--line);
+  border-radius:8px; padding:.4em .6em; min-height:44px; max-width:100%;
+}
+select{flex:1;}
+input.num{width:5.5rem; text-align:center; font-size:1.2rem; direction:ltr;}
+.fb{min-height:1.6em; margin:.6em 0 0; font-weight:500;}
+.fb.ok{color:var(--good);} .fb.no{color:var(--bad);}
+.ex{display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:6px 0;}
+.eq{color:var(--muted);}
+.env{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-top:10px;}
+.env button{
+  display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;
+  background:var(--surface); color:var(--ink); border:2px solid var(--line); border-radius:10px; padding:12px; font:inherit;
+}
+.env button .syms{display:flex; gap:8px;}
+.bout{
+  min-height:3.2rem; border:2px dashed var(--line); border-radius:10px; padding:8px 12px; margin:8px 0;
+  display:flex; align-items:center; gap:10px; direction:ltr; font-size:2rem; font-weight:700; flex-wrap:wrap;
+}
+.bout .ph{color:var(--muted); font-size:1rem; font-weight:400; direction:rtl;}
+.brow{display:flex; gap:10px; flex-wrap:wrap; margin:8px 0;}
+.tk{
+  font-family:"Reem Kufi",Tajawal,sans-serif; font-size:2rem; width:64px; height:56px; cursor:pointer;
+  background:var(--surface); color:var(--ink); border:2px solid var(--line); border-radius:10px;
+}
+.mapwrap{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:6px; align-items:center; justify-items:center; margin:14px auto; width:100%; max-width:460px;}
+.mapwrap .top{grid-column:2; grid-row:1;} .mapwrap .left{grid-column:1; grid-row:2;}
+.mapwrap .grid5{grid-column:2; grid-row:2;} .mapwrap .right{grid-column:3; grid-row:2;} .mapwrap .bottom{grid-column:2; grid-row:3;}
+.grid5{display:grid; grid-template-columns:repeat(5,1fr); gap:4px; width:100%;}
+.cell{
+  position:relative; aspect-ratio:1; display:grid; place-items:center; cursor:pointer;
+  font-family:"Reem Kufi",Tajawal,sans-serif; font-size:1.3rem; font-weight:700;
+  background:var(--surface); color:var(--ink); border:2px solid var(--line); border-radius:8px; padding:0;
+}
+.cell.start{background:var(--wall);}
+.cell.here{border-color:var(--ochre); box-shadow:0 0 0 3px var(--ochre) inset;}
+.cell .pin{position:absolute; top:1px; inset-inline-start:2px; font-size:.9rem;}
+.jars{display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); gap:10px; margin:12px 0;}
+.jar{background:var(--wall); border:2px solid var(--line); border-radius:12px 12px 22px 22px; padding:10px 6px; text-align:center; min-height:84px; display:grid; place-items:center; direction:ltr; font-size:1.6rem; font-weight:700;}
+.jar.q{border-style:dashed; color:var(--red); font-size:2.2rem;}
+.animals{display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; margin:12px 0;}
+.an{
+  position:relative; display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer;
+  background:var(--surface); color:var(--ink); border:2px solid var(--line); border-radius:12px; padding:12px 6px; font:inherit;
+}
+.an .sym{font-size:2.6rem;}
+.an.pick{border-color:var(--ochre); box-shadow:0 0 0 3px var(--ochre) inset;}
+.an .no{position:absolute; top:6px; inset-inline-start:8px; background:var(--ochre); color:var(--ochre-ink); width:1.6rem; height:1.6rem; border-radius:50%; display:none; place-items:center; font-weight:700; font-size:.95rem;}
+.an.pick .no{display:grid;}
+.letters{display:flex; gap:10px; justify-content:center; margin:10px 0; font-family:"Reem Kufi",Tajawal,sans-serif; font-size:2.6rem; font-weight:700;}
+.letters span{width:3.4rem; height:3.8rem; display:grid; place-items:center; background:var(--wall); border:2px solid var(--ochre); border-radius:10px;}
+.lock{display:flex; gap:10px; justify-content:center; margin:14px 0; direction:ltr;}
+.lock input{width:3.4rem; height:4.2rem; text-align:center; font-size:2rem; font-family:"Reem Kufi",Tajawal,sans-serif; font-weight:700; padding:0;}
+.slots{display:flex; gap:12px; justify-content:center; margin:14px 0;}
+.slot{width:5rem; height:5rem; display:grid; place-items:center; border:3px dashed var(--line); border-radius:12px; background:var(--wall); cursor:pointer; padding:0; color:inherit;}
+.slot.full{border-style:solid; border-color:var(--ochre);}
+.stones{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; max-width:420px; margin:0 auto;}
+.stone{aspect-ratio:1; display:grid; place-items:center; background:var(--surface); border:2px solid var(--line); border-radius:12px; cursor:pointer; padding:0; color:inherit;}
+.stone:disabled{opacity:.3; cursor:not-allowed;}
+.hintbox{margin:0 0 14px; padding:12px 16px; border-inline-start:5px solid var(--ochre); background:var(--surface); border-radius:6px; display:none;}
+.hintbox.on{display:block;}
+.hintbox ol{margin:.3em 0 0; padding-inline-start:1.3em;}
+.hintbar{display:flex; justify-content:space-between; align-items:center; gap:10px; margin:0 0 10px; flex-wrap:wrap;}
+.hintbar .btn{padding:.4em 1em; min-height:40px; font-size:.95rem;}
+.fact{background:var(--wall); border:2px solid var(--ochre); border-radius:10px; padding:12px 16px; margin-top:12px;}
+.stars{font-size:2.4rem; letter-spacing:.2em;}
+.toast{
+  position:fixed; bottom:calc(20px + env(safe-area-inset-bottom,0px)); inset-inline:16px; margin:auto; width:fit-content; max-width:92%;
+  background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:10px; font-weight:500; z-index:60; display:none; text-align:center;
+}
+.toast.on{display:block;}
+.center{text-align:center;}
+.rules{padding-inline-start:1.2em; margin:.4em 0;}
+.hidden{display:none !important;}
+@media (max-width:480px){ body{font-size:16px;} .sym{font-size:1.7rem;} .secret .sym{font-size:2.5rem;} .cell{font-size:1.1rem;} }
+</style>
+</head>
+<body>
+
+<header class="hud" id="hud" hidden>
+  <div class="hud-row">
+    <div class="clock" id="clockWrap"><span class="flame sym" style="font-size:1.5rem">🔥</span><span id="clock">50:00</span></div>
+    <div class="code" aria-label="الأرقام التي جمعتموها"><span>الكود</span><span class="cs" id="c0">؟</span><span class="cs" id="c1">؟</span><span class="cs" id="c2">؟</span><span class="cs" id="c3">؟</span></div>
+  </div>
+  <div class="torch" aria-hidden="true"><i id="torchbar"></i></div>
+</header>
+
+<main class="wrap">
+
+<!-- مقدمة -->
+<section class="stage on" id="intro">
+  <div class="center" style="padding:18px 0 4px"><span class="sym" style="font-size:3.4rem">🖐️</span></div>
+  <h1 class="center">سرّ الجدار المنقوش</h1>
+  <h3 class="center">الهروب من كهف الرموز الأولى</h3>
+  <div class="panel rock">
+    <p>أنتم فريق علماء آثار صغار دخلتم كهفًا اكتُشف حديثًا في أعماق الجبل. تدحرجت صخرة ضخمة وسدّت المدخل، والشعلة الوحيدة معكم ستنطفئ بعد 50 دقيقة.</p>
+    <p>على الجدران رسوم تركتها قبيلة قديمة. لم تكن عندها حروف كما نعرفها، لكنها كتبت بالرموز. يقول المثل القديم: «من يقرأ الجدار، يفتح الباب».</p>
+  </div>
+  <div class="panel">
+    <h2>قواعد اللعبة</h2>
+    <ul class="rules">
+      <li>خمس محطات ثم صندوق حجري ثم حارس الكهف.</li>
+      <li>كل محطة تمنحكم رقمًا سريًا. اجمعوا الأرقام الأربعة بالترتيب.</li>
+      <li>لديكم 3 أحجار تلميح، وكل حجر يكلّفكم دقيقتين من الوقت.</li>
+      <li>الاختيار الخاطئ في الفخاخ يكلّفكم دقيقة.</li>
+      <li>العبوا معًا في فريق، فالأفكار الجماعية أسرع.</li>
+    </ul>
+  </div>
+  <div class="center"><button class="btn" id="startBtn" style="font-size:1.2rem; padding:.7em 2em">ادخلوا الكهف</button></div>
+</section>
+
+<div id="hintArea" class="hidden">
+  <div class="hintbar">
+    <span id="hintInfo" class="eq"></span>
+    <button class="btn ghost" id="hintBtn">استخدموا حجر تلميح</button>
+  </div>
+  <div class="hintbox" id="hintbox"></div>
+</div>
+
+<!-- المحطة 1 -->
+<section class="stage" id="s1">
+  <h2>الجدار الأول: قاموس الحكيم</h2>
+  <p>الحكيم ترك أربع جمل مترجمة على الصخرة. استنتجوا معنى كل رمز، فالرسالة السرية بلا ترجمة.</p>
+  <div class="panel rock" id="wall"></div>
+  <div class="panel">
+    <h3>قاموسكم: اختاروا معنى كل رمز</h3>
+    <div class="dict" id="dict"></div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="dictCheck">تحقّقوا من القاموس</button></div>
+    <p class="fb" id="dictFb"></p>
+  </div>
+  <div class="panel rock hidden" id="msgPart">
+    <h3>الرسالة السرية</h3>
+    <div class="sent secret"><span class="syms" id="secretSyms"></span></div>
+    <p class="center">اختاروا المظروف الذي تدلّكم عليه الرسالة: أين تتجهون ومتى؟</p>
+    <div class="env" id="envs"></div>
+    <p class="fb" id="envFb"></p>
+  </div>
+</section>
+
+<!-- المحطة 2 -->
+<section class="stage" id="s2">
+  <h2>محطة الشجرة: العدّ الحجري</h2>
+  <p>القبيلة تعدّ بثلاثة رموز فقط. هذه أمثلة مترجمة على اللوح:</p>
+  <div class="panel rock" id="s2ex"></div>
+  <div class="panel" id="s2a">
+    <h3>الخطوة الأولى: ما قيمة كل رمز؟</h3>
+    <div class="row">
+      <span class="tl">|</span> = <input class="num" id="v1" type="text" inputmode="numeric" aria-label="قيمة الخط">
+      <span class="tl">∩</span> = <input class="num" id="v5" type="text" inputmode="numeric" aria-label="قيمة القوس">
+      <span class="tl">○</span> = <input class="num" id="v25" type="text" inputmode="numeric" aria-label="قيمة الدائرة">
+      <button class="btn" id="s2aBtn">تحقّقوا</button>
+    </div>
+    <p class="fb" id="s2aFb"></p>
+  </div>
+  <div class="panel hidden" id="s2b">
+    <h3>الخطوة الثانية: صيد ثلاثة صيادين</h3>
+    <div class="rock panel" style="margin-top:0" id="hunters"></div>
+    <div class="row">ما مجموع صيدهم؟ <input class="num" id="tot" type="text" inputmode="numeric" aria-label="المجموع"><button class="btn" id="s2bBtn">تحقّقوا</button></div>
+    <p class="fb" id="s2bFb"></p>
+  </div>
+  <div class="panel hidden" id="s2c">
+    <h3>الخطوة الثالثة: اكتبوا المجموع بلغة القبيلة</h3>
+    <p>استخدموا أقل عدد ممكن من الرموز، وعدد رموزكم هو مفتاحكم.</p>
+    <div id="b82"></div>
+  </div>
+  <div class="panel hidden" id="s2done"></div>
+</section>
+
+<!-- المحطة 3 -->
+<section class="stage" id="s3">
+  <h2>محطة النهر: الخريطة المشفّرة</h2>
+  <p>أنتم تقفون عند النجمة. كل أمر يتكوّن من رمز اتجاه ثم خطوط بعدد الخطوات. رموز الحافة تدلّكم على الاتجاهات.</p>
+  <div class="panel rock">
+    <h3>الأوامر بالترتيب</h3>
+    <div id="cmds"></div>
+    <div class="ex" style="border-top:1px dashed var(--line); margin-top:8px; padding-top:10px">
+      <strong>مثال مترجم:</strong><span id="cmdEx"></span><span class="eq">= شمالًا خطوتان</span>
+    </div>
+  </div>
+  <div class="panel">
+    <p>اضغطوا على الخلايا لتتبّعوا مساركم، ثم أكّدوا الخلية التي تقفون فيها بعد الأمر الأخير.</p>
+    <div class="mapwrap" dir="ltr">
+      <span class="top" id="eTop"></span><span class="left" id="eLeft"></span>
+      <div class="grid5" id="grid"></div>
+      <span class="right" id="eRight"></span><span class="bottom" id="eBottom"></span>
+    </div>
+    <div class="center"><button class="btn" id="s3Btn">أنا أقف هنا</button></div>
+    <p class="fb center" id="s3Fb"></p>
+  </div>
+  <div class="panel hidden" id="s3done"></div>
+</section>
+
+<!-- المحطة 4 -->
+<section class="stage" id="s4">
+  <h2>محطة الجبل: الحجارة المتسلسلة</h2>
+  <p>الحكيم عدّ حبوبه كل ليلة قمر، ولم يضع الأعداد عشوائيًا. الجرة الخامسة انكسرت. أعيدوا كتابة عددها بلغة القبيلة.</p>
+  <div class="panel rock"><div class="jars" id="jars"></div></div>
+  <div class="panel">
+    <p>اكتبوا العدد الناقص بأقل عدد ممكن من الرموز، وعدد رموزكم هو مفتاحكم.</p>
+    <div id="b26"></div>
+  </div>
+  <div class="panel hidden" id="s4done"></div>
+</section>
+
+<!-- المحطة 5 -->
+<section class="stage" id="s5">
+  <h2>محطة الموقد: من الصورة إلى الحرف</h2>
+  <div class="panel rock">
+    <p>«حين تحدّث أجدادنا، سكن الصوتُ الأول في اسم كل صورة. خذوا الحيوانات الثلاثة الأصغر، وابدؤوا بأصغرها وانتهوا بأكبرها. الكلمة التي تتكوّن عدد، وهو مفتاحكم.»</p>
+  </div>
+  <div class="animals" id="animals"></div>
+  <div class="row center" style="justify-content:center">
+    <button class="btn ghost" id="anClr">مسح الاختيار</button>
+    <button class="btn" id="anOk" disabled>اقرؤوا الحروف</button>
+  </div>
+  <p class="fb center" id="anFb"></p>
+  <div class="panel hidden" id="s5b">
+    <div class="letters" id="letters"></div>
+    <p class="center">الكلمة عدد. ما هو هذا العدد؟</p>
+    <div class="row" style="justify-content:center"><input class="num" id="wordNum" type="text" inputmode="numeric" aria-label="العدد"><button class="btn" id="wordBtn">تحقّقوا</button></div>
+    <p class="fb center" id="wordFb"></p>
+  </div>
+  <div class="panel hidden" id="s5done"></div>
+</section>
+
+<!-- الصندوق -->
+<section class="stage" id="chest">
+  <h2>الصندوق الحجري</h2>
+  <div class="panel rock">
+    <p>على الصندوق قفل بأربعة أرقام، ونقش يقول: «رتّبوا الأرقام كما مررتم بالمحطات».</p>
+  </div>
+  <div class="lock" id="lock">
+    <input type="text" inputmode="numeric" maxlength="1" aria-label="الرقم الأول">
+    <input type="text" inputmode="numeric" maxlength="1" aria-label="الرقم الثاني">
+    <input type="text" inputmode="numeric" maxlength="1" aria-label="الرقم الثالث">
+    <input type="text" inputmode="numeric" maxlength="1" aria-label="الرقم الرابع">
+  </div>
+  <div class="center"><button class="btn" id="lockBtn">افتحوا الصندوق</button></div>
+  <p class="fb center" id="lockFb"></p>
+</section>
+
+<!-- الحارس -->
+<section class="stage" id="final">
+  <h2>لوح الحارس</h2>
+  <div class="panel rock">
+    <p class="center"><span class="sym" style="font-size:3rem">🗿</span></p>
+    <p>«أنا حارس هذا الكهف. لا أفهم إلا لغتنا، ولا أقبل إلا ترتيبنا. قولوا لي بلغتي: <strong>اذهبوا إلى الباب صباحًا</strong>.»</p>
+    <p class="eq">رمز جديد في الصندوق: <span class="sym">🚪</span> = الباب</p>
+  </div>
+  <div class="slots" id="slots"></div>
+  <div class="stones" id="stones"></div>
+  <div class="row" style="justify-content:center; margin-top:14px">
+    <button class="btn ghost" id="slotClr">مسح</button>
+    <button class="btn" id="slotOk" disabled>اعرضوا الجملة على الحارس</button>
+  </div>
+  <p class="fb center" id="slotFb"></p>
+</section>
+
+<!-- فوز -->
+<section class="stage" id="win">
+  <div class="panel rock center">
+    <p class="sym" style="font-size:3.6rem">🌅</p>
+    <h1>تحرّرتم من الكهف!</h1>
+    <p>تحرّك الحارس، وانفتح الباب الحجري، وتسلّل ضوء الصباح إلى الداخل.</p>
+    <p class="stars" id="stars"></p>
+    <p id="winStats"></p>
+    <div class="fact" style="text-align:start">
+      <strong>هل تعلمون؟</strong>
+      <p style="margin-bottom:0">الكتابة المسمارية في بلاد الرافدين ظهرت قبل نحو 5 آلاف سنة، وبدأت بصور صغيرة تحوّلت تدريجيًا إلى رموز للكلمات والأصوات. رموز هذه اللعبة مبتكرة، مستوحاة من الرسوم الكهفية.</p>
+    </div>
+    <p style="margin-top:16px"><button class="btn" id="again">العبوا مرة أخرى</button></p>
+  </div>
+</section>
+
+<!-- خسارة -->
+<section class="stage" id="lose">
+  <div class="panel rock center">
+    <p class="sym" style="font-size:3.6rem">🌑</p>
+    <h1>انطفأت الشعلة</h1>
+    <p>انتهى الوقت قبل أن تفتحوا الباب. الكهف ما زال يحفظ أسراره، فجرّبوا مرة أخرى بخطة أسرع.</p>
+    <p><button class="btn" id="again2">حاولوا من جديد</button></p>
+  </div>
+</section>
+
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var FE = '\uFE0F';
+  var SY = {foot:'👣', mount:'⛰'+FE, river:'🌊', tree:'🌳', sun:'☀'+FE, moon:'🌙', fire:'🔥', bull:'🦬', door:'🚪', we:'👥'};
+  function $(s){ return document.querySelector(s); }
+  function $$(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); }
+  function sy(){ var a=[].slice.call(arguments); return a.map(function(k){return '<span class="sym">'+SY[k]+'</span>';}).join(''); }
+  function tl(n){ return '<span class="tl">'+new Array(n+1).join('|')+'</span>'; }
+  function norm(v){
+    return String(v).replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d);})
+      .replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d);}).trim();
+  }
+  function shakeEl(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+
+  var TOTAL = 3000;
+  var S = {t:TOTAL, hints:3, used:0, digits:[], stage:'intro', rev:{}, timer:null, over:false};
+
+  var HINTS = {
+    s1:['ابحثوا عن رمز يتكرر في جملتين.','أي كلمة تتكرر في الترجمتين نفسيهما؟','👣 = اذهب، ☀ = صباحًا، 🌙 = ليلًا.'],
+    s2:['الخط والقوس والدائرة لهم قيم مختلفة، وكلها أعداد.','كوّنوا معادلتين من المثالين الأول والثاني.','الخط 1، والقوس 5، والدائرة 25.'],
+    s3:['الحواف تدلّكم على الجهات.','ماذا يفعل رمز 🦬 في المثال المترجم؟','الثور يضاعف عدد الخطوات.'],
+    s4:['حوّلوا كل عدد إلى نظامنا العشري.','انظروا إلى الفروق بين الأعداد.','الفروق: 3 ثم 5 ثم 7 ثم 9.'],
+    s5:['اسم كل صورة يخفي صوتًا في أوله.','اختاروا الحيوانات حسب الحجم.','الأحرف: س ثم ب ثم ع.'],
+    chest:['رتّبوا الأرقام كما مررتم بالمحطات.','الرقم الأول جاء من العدّ، والثاني من الخريطة.','الكود يبدأ بـ 6 وينتهي بـ 7.'],
+    final:['الجمل الأربع الأولى تتبع ترتيبًا ثابتًا.','الفعل أولًا.','الفعل ثم المكان ثم الزمن.']
+  };
+
+  function fmt(s){ var m=Math.floor(s/60), r=s%60; return (m<10?'0':'')+m+':'+(r<10?'0':'')+r; }
+  var toastT;
+  function toast(msg){
+    var t=$('#toast'); t.textContent=msg; t.classList.add('on');
+    clearTimeout(toastT); toastT=setTimeout(function(){t.classList.remove('on');},2600);
+  }
+  function renderHud(){
+    $('#clock').textContent = fmt(Math.max(0,S.t));
+    $('#clockWrap').classList.toggle('low', S.t<=300);
+    $('#torchbar').style.width = Math.max(0,S.t/TOTAL*100)+'%';
+    for(var i=0;i<4;i++){
+      var c=$('#c'+i);
+      if(S.digits[i]!==undefined){ c.textContent=S.digits[i]; c.classList.add('on'); }
+    }
+    $('#hintInfo').textContent = 'أحجار التلميح المتبقية: '+S.hints+' من 3';
+    $('#hintBtn').disabled = S.hints<=0 || !HINTS[S.stage];
+  }
+  function penalty(sec,msg){
+    S.t = Math.max(0,S.t-sec);
+    toast(msg+' (−'+(sec>=60? (sec/60)+' دقيقة' : sec+' ثانية')+')');
+    renderHud();
+    if(S.t<=0) end(false);
+  }
+  function renderHint(){
+    var box=$('#hintbox'), st=S.stage, n=S.rev[st]||0;
+    if(!n){ box.classList.remove('on'); box.innerHTML=''; return; }
+    var items=HINTS[st].slice(0,n).map(function(h){return '<li>'+h+'</li>';}).join('');
+    box.innerHTML='<strong>التلميحات:</strong><ol>'+items+'</ol>';
+    box.classList.add('on');
+  }
+  function useHint(){
+    var st=S.stage; if(!HINTS[st]||S.over) return;
+    var n=S.rev[st]||0;
+    if(n>=3){ toast('استخدمتم كل تلميحات هذه المحطة'); return; }
+    if(S.hints<=0){ toast('لا توجد أحجار تلميح'); return; }
+    S.hints--; S.used++; S.rev[st]=n+1;
+    renderHint(); penalty(120,'حجر تلميح');
+  }
+  function goto(name){
+    $$('.stage').forEach(function(s){ s.classList.remove('on'); });
+    $('#'+name).classList.add('on');
+    S.stage=name;
+    var play = !!HINTS[name];
+    $('#hud').hidden = !play;
+    $('#hintArea').classList.toggle('hidden', !play);
+    renderHint(); renderHud();
+    window.scrollTo(0,0);
+  }
+  function end(win){
+    if(S.over) return; S.over=true; clearInterval(S.timer);
+    if(win){
+      var left=S.t, stars = (left>=1200 && S.used===0)?3:(left>=600?2:1);
+      var s=''; for(var i=0;i<3;i++) s+= i<stars?'★':'☆';
+      $('#stars').textContent=s;
+      $('#winStats').textContent='الوقت المتبقي: '+fmt(left)+' — أحجار التلميح المستخدمة: '+S.used;
+      goto('win');
+    } else { goto('lose'); }
+  }
+  function addDigit(d){ S.digits.push(d); renderHud(); }
+  function done(panelId, digit, label, next){
+    var p=$('#'+panelId);
+    p.classList.remove('hidden');
+    p.innerHTML='<h3>أحسنتم!</h3><p>'+label+' <strong style="font-size:1.6rem">'+digit+'</strong></p><button class="btn">تابعوا إلى المحطة التالية</button>';
+    p.querySelector('button').addEventListener('click',function(){ goto(next); });
+    addDigit(digit);
+    p.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  function fb(id,msg,ok){ var e=$('#'+id); e.textContent=msg; e.className='fb'+(e.classList.contains('center')?' center':'')+(ok===true?' ok':ok===false?' no':''); }
+
+  /* ---------- المحطة 1 ---------- */
+  var SENT=[['foot','mount','sun','اذهب إلى الجبل صباحًا'],['foot','river','moon','اذهب إلى النهر ليلًا'],['fire','tree','sun','أشعل نارًا عند الشجرة صباحًا'],['fire','mount','moon','أشعل نارًا عند الجبل ليلًا']];
+  $('#wall').innerHTML = SENT.map(function(r){
+    return '<div class="sent"><span class="syms">'+sy(r[0],r[1],r[2])+'</span><span class="tr">'+r[3]+'</span></div>';
+  }).join('');
+  var DICT=[['foot','اذهب'],['mount','الجبل'],['river','النهر'],['tree','الشجرة'],['sun','صباحًا'],['moon','ليلًا'],['fire','أشعل نارًا']];
+  var OPTS=['أشعل نارًا','النهر','صباحًا','اذهب','الشجرة','ليلًا','الجبل'];
+  $('#dict').innerHTML = DICT.map(function(d){
+    return '<label>'+sy(d[0])+'<select data-k="'+d[0]+'"><option value="">؟</option>'+OPTS.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select></label>';
+  }).join('');
+  $('#dictCheck').addEventListener('click',function(){
+    var ok=0, empty=0, vals=[];
+    DICT.forEach(function(d){
+      var v=$('select[data-k="'+d[0]+'"]').value;
+      if(!v) empty++; else { vals.push(v); if(v===d[1]) ok++; }
+    });
+    if(empty){ fb('dictFb','املؤوا القاموس كله: بقي '+empty+' رموز بلا معنى.',false); return; }
+    if(new Set(vals).size<vals.length){ fb('dictFb','هناك معنى مكرر. لكل رمز معنى مختلف.',false); return; }
+    if(ok===7){
+      fb('dictFb','قاموس صحيح! الرسالة السرية انكشفت.',true);
+      $('#secretSyms').innerHTML=sy('foot','tree','moon');
+      $('#msgPart').classList.remove('hidden');
+      $('#msgPart').scrollIntoView({behavior:'smooth',block:'center'});
+    } else {
+      fb('dictFb','صحيح '+ok+' من 7. ابحثوا عن الرمز المشترك بين جملتين.',false);
+      shakeEl($('#dictFb'));
+    }
+  });
+  var ENVS=[{a:'mount',b:'moon',m:'الجبل ليس هو المكان الذي تقوله الرسالة.'},{a:'tree',b:'sun',m:'الشمس خدعتكم! الرسالة تقول وقتًا آخر.'},{a:'tree',b:'moon',ok:true},{a:'river',b:'moon',m:'النهر ليس هو المكان الذي تقوله الرسالة.'}];
+  $('#envs').innerHTML = ENVS.map(function(e,i){
+    return '<button data-i="'+i+'"><span class="syms">'+sy(e.a,e.b)+'</span><span>مظروف</span></button>';
+  }).join('');
+  $$('#envs button').forEach(function(b){
+    b.addEventListener('click',function(){
+      var e=ENVS[+b.dataset.i];
+      if(e.ok){ fb('envFb','المظروف الصحيح! فُتح لكم طريق محطة الشجرة.',true); setTimeout(function(){goto('s2');},900); }
+      else { fb('envFb',e.m,false); shakeEl(b); penalty(60,'فخ'); }
+    });
+  });
+
+  /* ---------- أداة بناء الأعداد ---------- */
+  function builder(root,target,min,onOk){
+    var V={'|':1,'∩':5,'○':25}, toks=[];
+    root.innerHTML='<div class="bout"></div><div class="brow" dir="ltr"><button class="tk" data-k="○" aria-label="دائرة">○</button><button class="tk" data-k="∩" aria-label="قوس">∩</button><button class="tk" data-k="|" aria-label="خط">|</button></div><div class="brow"><button class="btn ghost" data-a="undo">تراجع</button><button class="btn ghost" data-a="clr">مسح</button><button class="btn" data-a="ok">تحقّقوا</button></div><p class="fb"></p>';
+    var out=root.querySelector('.bout'), f=root.querySelector('.fb');
+    function draw(){ out.innerHTML = toks.length? toks.join(' ') : '<span class="ph">اضغطوا على الرموز لتكتبوا العدد</span>'; }
+    function msg(t,ok){ f.textContent=t; f.className='fb '+(ok?'ok':'no'); }
+    draw();
+    root.addEventListener('click',function(ev){
+      var b=ev.target.closest('button'); if(!b) return;
+      if(b.dataset.k){ toks.push(b.dataset.k); draw(); f.textContent=''; return; }
+      if(b.dataset.a==='undo'){ toks.pop(); draw(); }
+      if(b.dataset.a==='clr'){ toks=[]; draw(); }
+      if(b.dataset.a==='ok'){
+        var v=toks.reduce(function(s,k){return s+V[k];},0);
+        if(v!==target){ msg('ما كتبتموه لا يساوي العدد المطلوب. راجعوا قيم الرموز.',false); shakeEl(out); }
+        else if(toks.length>min){ msg('العدد صحيح، لكن يمكن كتابته بعدد رموز أقل. استخدموا الرموز الأكبر.',false); shakeEl(out); }
+        else { msg('عدد صحيح، وبأقل عدد من الرموز!',true); onOk(toks.length); }
+      }
+    });
+  }
+
+  /* ---------- المحطة 2 ---------- */
+  $('#s2ex').innerHTML=[['∩|||',8],['∩∩∩|',16],['○∩',30]].map(function(r){
+    var t=r[0].replace(/\|/g,'').length, bars=(r[0].match(/\|/g)||[]).length;
+    var syms=r[0].replace(/\|/g,'').split('').join(' ');
+    return '<div class="ex"><span class="tl">'+syms+(bars?' '+new Array(bars+1).join('|'):'')+'</span><span class="eq">=</span><strong>'+r[1]+'</strong></div>';
+  }).join('');
+  $('#s2aBtn').addEventListener('click',function(){
+    var a=norm($('#v1').value), b=norm($('#v5').value), c=norm($('#v25').value);
+    if(a==='1'&&b==='5'&&c==='25'){
+      fb('s2aFb','قيم صحيحة!',true); $('#s2b').classList.remove('hidden');
+      $('#hunters').innerHTML=[['الأول','○∩∩||'],['الثاني','∩∩∩|'],['الثالث','○||||']].map(function(h){
+        return '<div class="ex"><strong>الصياد '+h[0]+'</strong><span class="tl">'+h[1].split('').join(' ')+'</span></div>';
+      }).join('');
+      $('#s2b').scrollIntoView({behavior:'smooth',block:'center'});
+    } else { fb('s2aFb','ليست كلها صحيحة. استخرجوا القيم من المعادلات بين الأمثلة.',false); shakeEl($('#s2aFb')); }
+  });
+  var b82Init=false;
+  $('#s2bBtn').addEventListener('click',function(){
+    if(norm($('#tot').value)==='82'){
+      fb('s2bFb','المجموع صحيح: 82.',true); $('#s2c').classList.remove('hidden');
+      if(!b82Init){ b82Init=true; builder($('#b82'),82,6,function(n){ done('s2done',n,'الرقم الأول في الكود:','s3'); }); }
+      $('#s2c').scrollIntoView({behavior:'smooth',block:'center'});
+    } else { fb('s2bFb','ليس المجموع الصحيح. حوّلوا صيد كل صياد إلى عدد ثم اجمعوا.',false); shakeEl($('#s2bFb')); }
+  });
+
+  /* ---------- المحطة 3 ---------- */
+  var CMDS=[['sun',2,0],['mount',1,0],['moon',3,0],['river',2,0],['sun',1,1]];
+  $('#cmds').innerHTML=CMDS.map(function(c,i){
+    return '<div class="ex"><strong>'+(i+1)+'</strong>'+(c[2]?sy('bull'):'')+sy(c[0])+tl(c[1])+'</div>';
+  }).join('');
+  $('#cmdEx').innerHTML=sy('bull','mount')+tl(1);
+  $('#eTop').innerHTML=sy('mount'); $('#eBottom').innerHTML=sy('river'); $('#eRight').innerHTML=sy('sun'); $('#eLeft').innerHTML=sy('moon');
+  var G=[[7,2,9,4,1],[5,8,6,2,3],[1,4,'★',7,9],[6,9,3,5,8],[2,7,5,1,4]];
+  var pos={r:2,c:2};
+  function drawGrid(){
+    $('#grid').innerHTML=G.map(function(row,r){return row.map(function(v,c){
+      var here=(pos.r===r&&pos.c===c), st=(r===2&&c===2);
+      return '<button class="cell'+(st?' start':'')+(here?' here':'')+'" data-r="'+r+'" data-c="'+c+'">'+(here?'<span class="pin sym" style="font-size:.9rem">📍</span>':'')+v+'</button>';
+    }).join('');}).join('');
+  }
+  drawGrid();
+  $('#grid').addEventListener('click',function(ev){
+    var b=ev.target.closest('.cell'); if(!b) return;
+    pos={r:+b.dataset.r,c:+b.dataset.c}; drawGrid();
+  });
+  $('#s3Btn').addEventListener('click',function(){
+    if(pos.r===3&&pos.c===3){ fb('s3Fb','أنتم عند الخلية الصحيحة!',true); done('s3done',G[3][3],'الرقم الثاني في الكود:','s4'); }
+    else if(pos.r===3&&pos.c===2){ fb('s3Fb','قريب جدًا. هل فهمتم ما يفعله رمز الثور في المثال؟',false); shakeEl($('#s3Fb')); }
+    else { fb('s3Fb','ليست الخلية الصحيحة. ابدؤوا من النجمة ونفّذوا الأوامر واحدًا واحدًا.',false); shakeEl($('#s3Fb')); }
+  });
+
+  /* ---------- المحطة 4 ---------- */
+  var JARS=['||','∩','∩∩','∩∩∩||','?','○∩∩||'];
+  $('#jars').innerHTML=JARS.map(function(j){
+    if(j==='?') return '<div class="jar q">؟</div>';
+    var bars=(j.match(/\|/g)||[]).length, rest=j.replace(/\|/g,'');
+    return '<div class="jar">'+(rest?rest.split('').join(' ')+' ':'')+new Array(bars+1).join('|')+'</div>';
+  }).join('');
+  builder($('#b26'),26,2,function(n){ done('s4done',n,'الرقم الثالث في الكود:','s5'); });
+
+  /* ---------- المحطة 5 ---------- */
+  var AN={sq:{e:'🐿️',n:'سنجاب',l:'س'},duck:{e:'🦆',n:'بطة',l:'ب'},goat:{e:'🐐',n:'عنزة',l:'ع'},horse:{e:'🐎',n:'حصان',l:'ح'},ele:{e:'🐘',n:'فيل',l:'ف'}};
+  var ANORD=['horse','duck','ele','sq','goat'], pick=[];
+  function drawAn(){
+    $('#animals').innerHTML=ANORD.map(function(k){
+      var i=pick.indexOf(k);
+      return '<button class="an'+(i>=0?' pick':'')+'" data-k="'+k+'"><span class="no">'+(i+1)+'</span><span class="sym">'+AN[k].e+'</span><strong>'+AN[k].n+'</strong></button>';
+    }).join('');
+    $('#anOk').disabled = pick.length!==3;
+  }
+  drawAn();
+  $('#animals').addEventListener('click',function(ev){
+    var b=ev.target.closest('.an'); if(!b) return; var k=b.dataset.k, i=pick.indexOf(k);
+    if(i>=0) pick.splice(i,1); else if(pick.length<3) pick.push(k);
+    drawAn(); fb('anFb','');
+  });
+  $('#anClr').addEventListener('click',function(){ pick=[]; drawAn(); fb('anFb',''); });
+  $('#anOk').addEventListener('click',function(){
+    var want=['sq','duck','goat'];
+    if(pick.join()===want.join()){
+      $('#letters').innerHTML=pick.map(function(k){return '<span>'+AN[k].l+'</span>';}).join('');
+      fb('anFb','الحروف: س ثم ب ثم ع.',true);
+      $('#s5b').classList.remove('hidden'); $('#s5b').scrollIntoView({behavior:'smooth',block:'center'});
+    } else if(pick.slice().sort().join()===want.slice().sort().join()){
+      fb('anFb','اختياركم صحيح لكن الترتيب خاطئ. ابدؤوا بالأصغر وانتهوا بالأكبر.',false); shakeEl($('#anFb'));
+    } else {
+      fb('anFb','ليس هذا ما طلبه الحكيم. اختاروا الحيوانات الثلاثة الأصغر حجمًا.',false); shakeEl($('#anFb'));
+    }
+  });
+  $('#wordBtn').addEventListener('click',function(){
+    if(norm($('#wordNum').value)==='7'){
+      fb('wordFb','«سبع» تعني سبعة!',true);
+      done('s5done',7,'الرقم الرابع في الكود:','chest');
+      var p=$('#s5done'), fct=document.createElement('div'); fct.className='fact';
+      fct.innerHTML='<strong>معلومة:</strong> الحروف الأبجدية القديمة نشأت من صور تدل على أول صوت في اسم الصورة. يُرجَّح أن حرف الألف تطوّر من رأس الثور، وحرف الباء من البيت.';
+      p.insertBefore(fct,p.querySelector('button'));
+    } else { fb('wordFb','ليس هذا العدد. اقرؤوا الكلمة كما تقرؤون أي كلمة.',false); shakeEl($('#wordFb')); }
+  });
+
+  /* ---------- الصندوق ---------- */
+  var LI=$$('#lock input');
+  LI.forEach(function(inp,i){
+    inp.addEventListener('input',function(){ inp.value=norm(inp.value).replace(/\D/g,'').slice(0,1); if(inp.value&&LI[i+1]) LI[i+1].focus(); });
+    inp.addEventListener('keydown',function(e){ if(e.key==='Backspace'&&!inp.value&&LI[i-1]) LI[i-1].focus(); });
+  });
+  $('#lockBtn').addEventListener('click',function(){
+    var code=LI.map(function(x){return x.value;}).join('');
+    if(code==='6527'){ fb('lockFb','انفتح القفل! في الداخل لوح الحارس.',true); setTimeout(function(){goto('final');},900); }
+    else { fb('lockFb','الكود خاطئ. رتّبوا الأرقام كما مررتم بالمحطات.',false); shakeEl($('#lock')); }
+  });
+
+  /* ---------- الحارس ---------- */
+  var STONES=['tree','we','sun','mount','door','moon','fire','foot','bull','river'], slots=[null,null,null];
+  function drawSlots(){
+    $('#slots').innerHTML=slots.map(function(s,i){
+      return '<button class="slot'+(s?' full':'')+'" data-i="'+i+'" aria-label="خانة '+(i+1)+'">'+(s?sy(s):'')+'</button>';
+    }).join('');
+    $('#stones').innerHTML=STONES.map(function(k){
+      return '<button class="stone" data-k="'+k+'"'+(slots.indexOf(k)>=0?' disabled':'')+'>'+sy(k)+'</button>';
+    }).join('');
+    $('#slotOk').disabled = slots.indexOf(null)>=0;
+  }
+  drawSlots();
+  $('#stones').addEventListener('click',function(ev){
+    var b=ev.target.closest('.stone'); if(!b||b.disabled) return;
+    var i=slots.indexOf(null); if(i<0) return; slots[i]=b.dataset.k; drawSlots(); fb('slotFb','');
+  });
+  $('#slots').addEventListener('click',function(ev){
+    var b=ev.target.closest('.slot'); if(!b) return; slots[+b.dataset.i]=null; drawSlots();
+  });
+  $('#slotClr').addEventListener('click',function(){ slots=[null,null,null]; drawSlots(); fb('slotFb',''); });
+  $('#slotOk').addEventListener('click',function(){
+    if(slots.join()==='foot,door,sun'){ fb('slotFb','الحارس يومئ برأسه…',true); setTimeout(function(){end(true);},800); }
+    else { fb('slotFb','الحارس يهزّ رأسه: «لا أفهم». تذكّروا ترتيب الجمل عند القبيلة.',false); shakeEl($('#slots')); penalty(60,'الحارس لم يفهم'); }
+  });
+
+  /* ---------- البدء ---------- */
+  $('#hintBtn').addEventListener('click',useHint);
+  $('#startBtn').addEventListener('click',function(){
+    goto('s1');
+    S.timer=setInterval(function(){ S.t--; renderHud(); if(S.t<=0) end(false); },1000);
+  });
+  $('#again').addEventListener('click',function(){ location.reload(); });
+  $('#again2').addEventListener('click',function(){ location.reload(); });
+  renderHud();
+})();
+</script>
+</body>
+</html>
